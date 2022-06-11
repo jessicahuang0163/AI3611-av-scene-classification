@@ -120,10 +120,6 @@ class SolutionToDifferentClass(nn.Module):
             nn.Linear(512, 128),
             nn.Linear(128, self.num_classes),
         )
-        self.weights = nn.Parameter(
-            torch.tensor((0.7, 0.49, 0.45, 0.4, 0.5, 0.55, 0.5, 0.55, 0.55, 0.55)),
-            requires_grad=True,
-        )
 
     def forward(self, audio_feat, video_feat):
         # audio_feat: [batch_size, time_steps, feat_dim]
@@ -134,9 +130,11 @@ class SolutionToDifferentClass(nn.Module):
         video_emb = video_feat.mean(1)
         video_pred = self.video_pred(video_emb)
 
-        class_weights = self.weights
+        # class_weights = 0.6
+        class_weights = torch.tensor(
+            (0.6, 0.5, 0.4, 0.4, 0.5, 0.6, 0.5, 0.6, 0.6, 0.6)
+        ).to("cuda")
         output = audio_pred * class_weights + video_pred * (1 - class_weights)
-        print(class_weights)
         return output
 
 
